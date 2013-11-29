@@ -1,6 +1,5 @@
 *.class
 *.project
 # Package Files #
-*.jar
 *.war
 *.ear
