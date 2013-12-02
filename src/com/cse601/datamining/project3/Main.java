@@ -4,29 +4,31 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Vector;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Scanner;
 import java.util.Vector;
 
+import com.cse601.datamining.project3.alogorithms.NearestNeighbour;
+
 public class Main{
 	public static String PRESENT = "Present";
 	public static String ABSENT = "Absent";
 	
-	ArrayList<Vector> dataset1_train = new ArrayList<>();
-	ArrayList<Vector> dataset2_train = new ArrayList<>();
-	ArrayList<Vector> dataset1_test = new ArrayList<>();
-	ArrayList<Vector> dataset2_test = new ArrayList<>();
+	Vector<Vector> dataset1_train = new Vector<>();
+	Vector<Vector> dataset2_train = new Vector<>();
+	Vector<Vector> dataset1_test = new Vector<>();
+	Vector<Vector> dataset2_test = new Vector<>();
 	
 	HashMap<Integer, Double> euclidDistanceDS1_train = new HashMap<>();
 	HashMap<Integer, Double> euclidDistanceDS2_train = new HashMap<>();
 	HashMap<Integer, Double> euclidDistanceDS1_test = new HashMap<>();
 	HashMap<Integer, Double> euclidDistanceDS2_test = new HashMap<>();
 	
-	int dimensionDS1 = 0; // Store dimension count of dataset1
-	int dimensionDS2 = 0; // Store dimension count of dataset2
+	int dimensionDS1; // Store dimension count of dataset1
+	int dimensionDS2; // Store dimension count of dataset2
 	
 	
 	public static void main(String args[]){
@@ -53,15 +55,20 @@ public class Main{
 		
 		System.out.println("dim " + main.dimensionDS1);
 		
-		ArrayList<Vector<Double>> arr = new ArrayList<>();
+		Vector<Vector<Double>> arr = new Vector<>();
 		for(int i = 0; i<main.dimensionDS1;i++)
 			arr.add(main.findRange(main.dataset1_train,i));
 		
 		for(int i = 0; i<main.dimensionDS1;i++)
 			System.out.println("***" + arr.get(i));
+		
+		/*NearestNeighbour nearestNeighbour = new NearestNeighbour();
+		nearestNeighbour.process(main.dataset1_test,main.dataset1_train);
+		nearestNeighbour.process(main.dataset2_test,main.dataset2_train);*/
+		
 	}
 	
-	public void readFiles(String filePath, ArrayList<Vector> dataset, ArrayList<Vector> dataset1, int dimCount){
+	public void readFiles(String filePath, Vector<Vector> dataset, Vector<Vector> dataset1, int dimCount){
 		FileReader fr;
 		String[] elements = null;
 		try {
@@ -85,6 +92,8 @@ public class Main{
 				dataset.add(vect);
 			}
 			dimCount = elements.length; // set the number of dimensions
+			
+			System.out.println(dimCount);
 			int len = (int) (dataset.size() * (0.75));
 			for(int i = 0; i< len;i++){
 				dataset1.add(dataset.get(i));
@@ -122,7 +131,7 @@ public class Main{
 		return Math.sqrt(distance);
 	}
 	//calculate the probability of 0s and return the value
-	public double probabilityLabels(ArrayList<Vector> inputList){
+	public double probabilityLabels(Vector<Vector> inputList){
 		double count0 = 0;
 		double count1 = 0;
 		for(int i=0;i<inputList.size();i++){
@@ -137,7 +146,7 @@ public class Main{
 	}
 	
 	//Find the range of the given dataset
-	public Vector<Double> findRange(ArrayList<Vector> inputArr, int n){
+	public Vector<Double> findRange(Vector<Vector> inputArr, int n){
 		Vector<Double> vect = new Vector<>();
 		double[] arr = new double[inputArr.size()];
 		for(int i=0;i<inputArr.size()-1;i++){
