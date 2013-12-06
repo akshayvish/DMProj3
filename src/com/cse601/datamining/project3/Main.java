@@ -4,13 +4,13 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Vector;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Scanner;
 import java.util.Vector;
 
+import com.cse601.datamining.project3.alogorithms.DecisionTree;
 import com.cse601.datamining.project3.alogorithms.NearestNeighbour;
 
 public class Main{
@@ -62,10 +62,28 @@ public class Main{
 		for(int i = 0; i<main.dimensionDS1;i++)
 			System.out.println("***" + arr.get(i));
 		
-		/*NearestNeighbour nearestNeighbour = new NearestNeighbour();
-		nearestNeighbour.process(main.dataset1_test,main.dataset1_train);
-		nearestNeighbour.process(main.dataset2_test,main.dataset2_train);*/
 		
+		//######################### NEAREST NEIGHBOUR BEGIN ############################
+		NearestNeighbour nearestNeighbour = new NearestNeighbour();
+		System.out.println("\n\n######################### NEAREST NEIGHBOUR BEGIN ############################");
+		System.out.println("\nFor Data 1\n");
+		nearestNeighbour.process(main.dataset1_test,main.dataset1_train);
+		System.out.println("\n\nFor Data 2\n");
+		nearestNeighbour.process(main.dataset2_test,main.dataset2_train);
+		System.out.println("\n######################### NEAREST NEIGHBOUR END ############################\n\n");
+		//######################### NEAREST NEIGHBOUR END ############################
+		
+		
+		
+		//######################### DECISION TREE BEGIN ############################
+		DecisionTree decisionTree = new DecisionTree();
+		System.out.println("\n\n######################### DECISION TREE BEGIN ############################");
+		System.out.println("\nFor Data 1\n");
+		decisionTree.process(main.dataset1_test, main.dataset1_train);
+		//System.out.println("\n\nFor Data 2\n");
+		//nearestNeighbour.process(main.dataset2_test, main.dataset2_train);
+		System.out.println("\n######################### DECISION TREE End ############################\n\n");
+		//######################### DECISION TREE END ############################
 	}
 	
 	public void readFiles(String filePath, Vector<Vector> dataset, Vector<Vector> dataset1, int dimCount){
@@ -93,7 +111,7 @@ public class Main{
 			}
 			dimCount = elements.length; // set the number of dimensions
 			
-			System.out.println(dimCount);
+			//System.out.println(dimCount);
 			int len = (int) (dataset.size() * (0.75));
 			for(int i = 0; i< len;i++){
 				dataset1.add(dataset.get(i));
