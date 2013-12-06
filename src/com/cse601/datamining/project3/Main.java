@@ -62,7 +62,7 @@ public class Main{
 		for(int i = 0; i<main.dimensionDS1;i++)
 			System.out.println("***" + arr.get(i));
 		
-		
+		/*
 		//######################### NEAREST NEIGHBOUR BEGIN ############################
 		NearestNeighbour nearestNeighbour = new NearestNeighbour();
 		System.out.println("\n\n######################### NEAREST NEIGHBOUR BEGIN ############################");
@@ -73,7 +73,7 @@ public class Main{
 		System.out.println("\n######################### NEAREST NEIGHBOUR END ############################\n\n");
 		//######################### NEAREST NEIGHBOUR END ############################
 		
-		
+		*/
 		
 		//######################### DECISION TREE BEGIN ############################
 		DecisionTree decisionTree = new DecisionTree();
@@ -81,7 +81,7 @@ public class Main{
 		System.out.println("\nFor Data 1\n");
 		decisionTree.process(main.dataset1_test, main.dataset1_train);
 		//System.out.println("\n\nFor Data 2\n");
-		//nearestNeighbour.process(main.dataset2_test, main.dataset2_train);
+		//decisionTree.process(main.dataset2_test, main.dataset2_train);
 		System.out.println("\n######################### DECISION TREE End ############################\n\n");
 		//######################### DECISION TREE END ############################
 	}
