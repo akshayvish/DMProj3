@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Vector;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -12,7 +11,6 @@ import java.util.Scanner;
 import java.util.Vector;
 
 import com.cse601.datamining.project3.alogorithms.NaiveBayes;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 
 public class Main{
 	public static String PRESENT = "Present";
@@ -24,13 +22,15 @@ public class Main{
 	//Vector<Vector> dataset2_test = new Vector<>();
 	
 	public static int datasetBooleanDimension = -1;
-	public static int kValue = 9;
-	
+	public static int kValue = 9;	
 	HashMap<Integer, Double> euclidDistanceDS1_train = new HashMap<>();
 	HashMap<Integer, Double> euclidDistanceDS2_train = new HashMap<>();
 	HashMap<Integer, Double> euclidDistanceDS1_test = new HashMap<>();
 	HashMap<Integer, Double> euclidDistanceDS2_test = new HashMap<>();
 	NaiveBayes nb;
+	
+	int dimensionDS1; // Store dimension count of dataset1
+	int dimensionDS2; // Store dimension count of dataset2
 	
 	public static void main(String args[]){
 
@@ -55,10 +55,12 @@ public class Main{
 		for(int i=0;i<main.dataset2_test.size()-1;i++){
 			//System.out.println(main.EuclideanDistance(main.dataset2_test.get(i), main.dataset2_test.get(i+1)));
 			main.euclidDistanceDS2_test.put(i, main.EuclideanDistance(main.dataset2_test.get(i), main.dataset2_test.get(i+1)));
+<<<<<<< HEAD
 		}*/
 	}
 	
 	public void readFiles(String filePath, Vector<Vector> dataset){
+		
 		FileReader fr;
 		String[] elements = null;
 		try {
@@ -88,6 +90,44 @@ public class Main{
 				if(datasetBooleanDimension!=-1)
 					System.out.println(datasetBooleanDimension);
 				dataset.add(vect);
+			}
+			Vector<Vector<Double>> arr = new Vector<>();
+			for(int i = 0; i<main.dimensionDS1;i++)
+				arr.add(main.findRange(main.dataset1_train,i));
+			
+			for(int i = 0; i<main.dimensionDS1;i++)
+				System.out.println("***" + arr.get(i));
+			
+			/*
+			//######################### NEAREST NEIGHBOUR BEGIN ############################
+			NearestNeighbour nearestNeighbour = new NearestNeighbour();
+			System.out.println("\n\n######################### NEAREST NEIGHBOUR BEGIN ############################");
+			System.out.println("\nFor Data 1\n");
+			nearestNeighbour.process(main.dataset1_test,main.dataset1_train);
+			System.out.println("\n\nFor Data 2\n");
+			nearestNeighbour.process(main.dataset2_test,main.dataset2_train);
+			System.out.println("\n######################### NEAREST NEIGHBOUR END ############################\n\n");
+			//######################### NEAREST NEIGHBOUR END ############################
+			
+			*/
+			
+			//######################### DECISION TREE BEGIN ############################
+			DecisionTree decisionTree = new DecisionTree();
+			System.out.println("\n\n######################### DECISION TREE BEGIN ############################");
+			System.out.println("\nFor Data 1\n");
+			decisionTree.process(main.dataset1_test, main.dataset1_train);
+			//System.out.println("\n\nFor Data 2\n");
+			//decisionTree.process(main.dataset2_test, main.dataset2_train);
+			System.out.println("\n######################### DECISION TREE End ############################\n\n");
+			//######################### DECISION TREE END ############################
+
+			//System.out.println(dimCount);
+			int len = (int) (dataset.size() * (0.75));
+			for(int i = 0; i< len;i++){
+				dataset1.add(dataset.get(i));
+			}
+			for(int j = 0; j<len ;j++){
+				dataset.remove(0);
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -140,8 +180,9 @@ public class Main{
 	}
 	
 	//Find the range of the given dataset
-	public Vector findRange(Vector<Vector> inputArr, int n){
-		Vector vect = new Vector<>();
+
+	public Vector<Double> findRange(Vector<Vector> inputArr, int n){
+		Vector<Double> vect = new Vector<>();
 		double[] arr = new double[inputArr.size()];
 		for(int i=0;i<inputArr.size()-1;i++){
 			arr[i] = (double) inputArr.get(i).get(n);
