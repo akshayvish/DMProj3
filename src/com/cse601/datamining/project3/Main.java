@@ -4,64 +4,61 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Vector;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Scanner;
 import java.util.Vector;
 
+import com.cse601.datamining.project3.alogorithms.NaiveBayes;
+import com.sun.org.apache.xpath.internal.operations.Bool;
+
 public class Main{
 	public static String PRESENT = "Present";
 	public static String ABSENT = "Absent";
 	
-	ArrayList<Vector> dataset1_train = new ArrayList<>();
-	ArrayList<Vector> dataset2_train = new ArrayList<>();
-	ArrayList<Vector> dataset1_test = new ArrayList<>();
-	ArrayList<Vector> dataset2_test = new ArrayList<>();
+	Vector<Vector> dataset1 = new Vector<>();
+	Vector<Vector> dataset2 = new Vector<>();
+	//Vector<Vector> dataset1_test = new Vector<>();
+	//Vector<Vector> dataset2_test = new Vector<>();
+	
+	public static int datasetBooleanDimension = -1;
+	public static int kValue = 9;
 	
 	HashMap<Integer, Double> euclidDistanceDS1_train = new HashMap<>();
 	HashMap<Integer, Double> euclidDistanceDS2_train = new HashMap<>();
 	HashMap<Integer, Double> euclidDistanceDS1_test = new HashMap<>();
 	HashMap<Integer, Double> euclidDistanceDS2_test = new HashMap<>();
-	
-	int dimensionDS1 = 0; // Store dimension count of dataset1
-	int dimensionDS2 = 0; // Store dimension count of dataset2
-	
+	NaiveBayes nb;
 	
 	public static void main(String args[]){
+
 		Main main = new Main();
-		main.readFiles(System.getProperty("user.dir") + "/src/Data/project3_dataset1.txt", main.dataset1_train, main.dataset1_test, main.dimensionDS1);
-		main.readFiles(System.getProperty("user.dir") + "/src/Data/project3_dataset2.txt", main.dataset2_train, main.dataset2_test, main.dimensionDS2);
+		main.readFiles(System.getProperty("user.dir") + "/src/Data/project3_dataset1.txt", main.dataset1);
+		//main.readFiles(System.getProperty("user.dir") + "/src/Data/project3_dataset2.txt", main.dataset2);
 		
-		System.out.println("Euclidean Distance for dataset 1");
-		for(int i=0;i<main.dataset1_train.size()-1;i++){
+		System.out.println(main.dataset1.get(0));
+		main.nb = new NaiveBayes(main.dataset1,kValue);
+		//main.nb = new NaiveBayes(main.dataset2,3);
+				
+		/*for(int i=0;i<main.dataset1_train.size()-1;i++){
 			main.euclidDistanceDS1_train.put(i, main.EuclideanDistance(main.dataset1_train.get(i), main.dataset1_train.get(i+1)));
 		}
 		for(int i=0;i<main.dataset1_test.size()-1;i++){
 			main.euclidDistanceDS1_test.put(i, main.EuclideanDistance(main.dataset1_test.get(i), main.dataset1_test.get(i+1)));
 		}
 		
-		System.out.println("Euclidean Distance for dataset 2");
 		for(int i=0;i<main.dataset2_train.size()-1;i++){
 			main.euclidDistanceDS2_train.put(i, main.EuclideanDistance(main.dataset2_train.get(i), main.dataset2_train.get(i+1)));
 		}
 		for(int i=0;i<main.dataset2_test.size()-1;i++){
 			//System.out.println(main.EuclideanDistance(main.dataset2_test.get(i), main.dataset2_test.get(i+1)));
 			main.euclidDistanceDS2_test.put(i, main.EuclideanDistance(main.dataset2_test.get(i), main.dataset2_test.get(i+1)));
-		}
-		
-		System.out.println("dim " + main.dimensionDS1);
-		
-		ArrayList<Vector<Double>> arr = new ArrayList<>();
-		for(int i = 0; i<main.dimensionDS1;i++)
-			arr.add(main.findRange(main.dataset1_train,i));
-		
-		for(int i = 0; i<main.dimensionDS1;i++)
-			System.out.println("***" + arr.get(i));
+		}*/
 	}
 	
-	public void readFiles(String filePath, ArrayList<Vector> dataset, ArrayList<Vector> dataset1, int dimCount){
+	public void readFiles(String filePath, Vector<Vector> dataset){
 		FileReader fr;
 		String[] elements = null;
 		try {
@@ -70,27 +67,27 @@ public class Main{
 			fr = new FileReader(filePath);
 			BufferedReader br = new BufferedReader(fr);
 			while((line = br.readLine())!=null){
-				Vector vect = new Vector<Double>();
+				Vector vect = new Vector();
+				//Vector<Boolean> vectBool = new Vector<Boolean>();
 				elements = line.split("\\s+"); // Extracting numbers in each line. Nodes per edge in our case.
 				for(int i=0;i<elements.length;i++){
 					try{
 					vect.add(Double.parseDouble(elements[i]));
 					}catch(NumberFormatException nfe){
-						if(elements[i].equalsIgnoreCase(PRESENT))
-							vect.add(1.0);
-						else if(elements[i].equalsIgnoreCase(ABSENT))
-							vect.add(0.0);
+						if(elements[i].equalsIgnoreCase(PRESENT)){
+							datasetBooleanDimension = i;
+							vect.add(Boolean.TRUE);
+							//vectBool.add(Boolean.TRUE);
+							}
+						else if(elements[i].equalsIgnoreCase(ABSENT)){
+							datasetBooleanDimension = i;
+							vect.add(Boolean.FALSE);
+						}
 					}
 				}
+				if(datasetBooleanDimension!=-1)
+					System.out.println(datasetBooleanDimension);
 				dataset.add(vect);
-			}
-			dimCount = elements.length; // set the number of dimensions
-			int len = (int) (dataset.size() * (0.75));
-			for(int i = 0; i< len;i++){
-				dataset1.add(dataset.get(i));
-			}
-			for(int j = 0; j<len ;j++){
-				dataset.remove(0);
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -98,6 +95,12 @@ public class Main{
 			e.printStackTrace();
 		}
 	}
+	
+	//Partitions the training dataset into K partitions 
+	public void kPartition(Vector<Vector> trainingSet,Vector<Vector> testingSet, int kfactor){
+		
+	}
+	
 	public String getInfofrmUser(String str){
 		Scanner userInput = new Scanner(System.in);
 		System.out.println("*********** IMPLEMENTATION OF Markov(MCL) ALGORITHM **********");
@@ -122,7 +125,7 @@ public class Main{
 		return Math.sqrt(distance);
 	}
 	//calculate the probability of 0s and return the value
-	public double probabilityLabels(ArrayList<Vector> inputList){
+	public double probabilityLabels(Vector<Vector> inputList){
 		double count0 = 0;
 		double count1 = 0;
 		for(int i=0;i<inputList.size();i++){
@@ -137,8 +140,8 @@ public class Main{
 	}
 	
 	//Find the range of the given dataset
-	public Vector<Double> findRange(ArrayList<Vector> inputArr, int n){
-		Vector<Double> vect = new Vector<>();
+	public Vector findRange(Vector<Vector> inputArr, int n){
+		Vector vect = new Vector<>();
 		double[] arr = new double[inputArr.size()];
 		for(int i=0;i<inputArr.size()-1;i++){
 			arr[i] = (double) inputArr.get(i).get(n);
@@ -148,11 +151,10 @@ public class Main{
 		vect.add(arr[arr.length-1]);
 		return vect;
 	}
-	//Find the conditional probability using the Normal Distribution.
+	//Find the conditional probability using the Normal Distribution P(observation|Class)
 	public double normalDist(double mean, double variance, double observation){
 		double denom = Math.pow(2*Math.PI * variance, 0.5); // variance is signma squared
 		double EPow = (Math.pow((observation-mean),2)) / (2*variance);
 		return (Math.pow(Math.E, EPow)/denom);
-		
 	}
 }
