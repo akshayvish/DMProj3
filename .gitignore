@@ -1,6 +1,15 @@
+.metadata/
+bin/
+build/
+
 *.class
-*.project
+
 # Package Files #
+*.classpath
+*.jar
 *.war
 *.ear
-/bin
+*.settings/
+
+#Mac
+.DS_Store

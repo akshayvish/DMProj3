@@ -5,18 +5,16 @@ import java.util.Arrays;
 
 import com.cse601.datamining.project3.alogorithms.Main;
 
-public class NaiveBayes {
+public class NaiveBayes_1 {
 
 	private int dimensionDS = 0; // Store dimension count of dataset1
 
 	private static String LABEL_0 = "LABEL0";
 	private static String LABEL_1 = "LABEL1";
 
-	int kFactor = 0;
 	int testPartitionIndex = 0;
 	int booleanDimensionIndex = -1;
-	
-	Vector<Vector> fullDataset = new Vector<>();
+
 	Vector<Vector<Vector>> partitionLists = new Vector<>(); // list of partitions containing set of samples.
 
 	Vector<Vector> trainDataset = new Vector<>();
@@ -30,59 +28,26 @@ public class NaiveBayes {
 
 	private String actualLabel[] = null;
 	private String predictionLabel[] = null;
-	
-	double[] accuracy = new double[Main.kValue];
-	double[] precision = new double[Main.kValue];
-	double[] recall = new double[Main.kValue];
-	double[] fMeasure = new double[Main.kValue];
 
 	double probLabel1; //Probability that the label is 1
 	double probLabel0; //Probability that the label is 0
 
-	public NaiveBayes(Vector<Vector> fullDataset, int kFactor) {
-		this.fullDataset = fullDataset; 
-		this.kFactor = kFactor;
-		//this.booleanDimensionIndex = booleanDimensionIndex;
-		dimensionDS = fullDataset.get(0).size();
-		partitionDataset(this.fullDataset, this.kFactor);
-		while(testPartitionIndex<partitionLists.size()){
-			assignPartitions();
-			operation();
-			testPartitionIndex++;
-		}
-		Arrays.sort(this.accuracy);
-		Arrays.sort(this.precision);
-		Arrays.sort(this.recall);
-		Arrays.sort(this.fMeasure);
-		double a=0,p=0,r=0,fm=0;
-		for(int i=0;i<Main.kValue;i++){
-			a = a + accuracy[i];
-			p = p + precision[i];
-			r = r + recall[i];
-			fm = fm + fMeasure[i];
-		}
-		
-		a = a/Main.kValue;
-		p = p/Main.kValue;
-		r = r/Main.kValue;
-		fm = fm/Main.kValue;
-		
-		System.out.println("************ Average ***************");
-		System.out.println("Accuracy " + a);
-		System.out.println("Precision " + p);
-		System.out.println("Recall " + r);
-		System.out.println("fMeasure " + fm);
+	public NaiveBayes_1(Vector<Vector> training, int kFactor, Vector<Vector> testing) {
+		this.trainDataset = training;
+		this.testDataset = testing;
+		dimensionDS = this.trainDataset.get(0).size();
+		operation();
 	}
 
 	public void operation(){
+
 		samplingClassification(); // Separate the dataset based on probabilities.
 		dimensionClassification(sample0DataSet, dimensionArray0); // Separate the above data based on dimensions.
 		dimensionClassification(sample1DataSet, dimensionArray1);
-	
+
 		double total = sample0DataSet.size() + sample1DataSet.size();
 		probLabel0 = (sample0DataSet.size()/total);
 		probLabel1 = (sample1DataSet.size()/total);
-
 		actualLabel = new String[testDataset.size()];
 		predictionLabel = new String[testDataset.size()];
 
@@ -134,7 +99,7 @@ public class NaiveBayes {
 				dimension.setBoolColumn(boolColumn);
 				dimension.setProbabilityOf0s(count0s/boolColumn.length);
 				dimension.setProbabilityOf1s(count1s/boolColumn.length);
-				
+
 			}else{
 				for(int j=0;j<column.length-1;j++ ){
 					column[j] = (double)(sampleInputArr.get(j).get(i));
@@ -164,38 +129,20 @@ public class NaiveBayes {
 		//p(Sample1|D) =  p(Sample1) * [p(D1|sample1) * p(D2|Sample1) * ..... * (D31|Sample1)] / [p(D1|sample1) * p(D2|Sample1) * ..... * (D31|Sample1)] * [p(D1|sample2) * p(D2|Sample2) * ..... * (D31|Sample2)]
 		double[] posteriorNumArray0 =  new double[observation.size()];
 		double[] posteriorNumArray1 =  new double[observation.size()];
-		
+
 		//For 0 labels
-		for(int i = 0; i<dimensionDS;i++){
-			
-			if(i == Main.datasetBooleanDimension){
-				
-				//Its a boolean value
-				if((boolean)observation.get(i))
-					posteriorNumArray0[i] = dimensionArray0.get(i).getProbabilityOf1s();//True represents Present / 1
-				else
-					posteriorNumArray0[i] = dimensionArray0.get(i).getProbabilityOf0s();//False represents Absent / 0 
-			}else{
-				double mean = dimensionArray0.get(i).getMean(); 
-				double variance = dimensionArray0.get(i).getVariance();
-				double obs = (double)observation.get(i);
-				posteriorNumArray0[i] = normalDist(mean, variance, obs);
-			}
+		for(int i = 0; i<dimensionDS-1;i++){
+			double mean = dimensionArray0.get(i).getMean(); 
+			double variance = dimensionArray0.get(i).getVariance();
+			double obs = (double)observation.get(i);
+			posteriorNumArray0[i] = normalDist(mean, variance, obs);
 		}
 		//For 1 labels
-		for(int i = 0; i<dimensionDS;i++){
-			if(i == Main.datasetBooleanDimension){
-				//Its a boolean value
-				if((boolean)observation.get(i))
-					posteriorNumArray1[i] = dimensionArray1.get(i).getProbabilityOf1s();//True represents Present / 1
-				else
-					posteriorNumArray1[i] = dimensionArray1.get(i).getProbabilityOf0s();//False represents Absent / 0				
-			}else{
-				double mean = dimensionArray1.get(i).getMean(); 
-				double variance = dimensionArray1.get(i).getVariance();
-				double obs = (double)observation.get(i);
-				posteriorNumArray1[i] = normalDist(mean, variance, obs);
-			}
+		for(int i = 0; i<dimensionDS-1;i++){
+			double mean = dimensionArray1.get(i).getMean(); 
+			double variance = dimensionArray1.get(i).getVariance();
+			double obs = (double)observation.get(i);
+			posteriorNumArray1[i] = normalDist(mean, variance, obs);
 		}
 
 		//multiply all the probabilities
@@ -219,7 +166,6 @@ public class NaiveBayes {
 
 		double posterior0 = (posteriorNumerator0/(posteriorNumerator0+posteriorNumerator1));
 		double posterior1 = (posteriorNumerator1/(posteriorNumerator0+posteriorNumerator1));
-
 		if(posterior0 > posterior1)
 			return LABEL_0;
 		else
@@ -231,7 +177,7 @@ public class NaiveBayes {
 		double b = 0;
 		double c = 0;
 		double d = 0;
-		
+
 		for(int i=0; i<actualLabel.length; i++){
 			if(actualLabel[i] == LABEL_0 && predictionLabel[i] == LABEL_0)
 				a++;
@@ -241,64 +187,20 @@ public class NaiveBayes {
 				c++;
 			if(actualLabel[i] == LABEL_1 && predictionLabel[i] == LABEL_1)
 				d++;
+			System.out.println(actualLabel[i] + " ** " + predictionLabel[i]);
 		}
 		//going by the matrix in the slide 8 of Clustering Basics.
 		double accuracy = (a + d)/(a + b + c + d);
 		double precision = (a)/(a + c);
 		double recall = (a/ (a + b));
 		double fMeasure = ((2*accuracy*precision)/(accuracy + precision));
+
+		System.out.println("************ Average ***************");
+		System.out.println("Accuracy " + accuracy);
+		System.out.println("Precision " + precision);
+		System.out.println("Recall " + recall);
+		System.out.println("fMeasure " + fMeasure);
 		
-		this.accuracy[testPartitionIndex] = accuracy;
-		this.precision[testPartitionIndex] = precision;
-		this.recall[testPartitionIndex] = recall;
-		this.fMeasure[testPartitionIndex] = fMeasure;
-	}
-
-	//Partition the whole dataset into K partitions.
-	public void partitionDataset(Vector<Vector> fullDataset, int kFactor){
-		int paritionSize = 0;
-		int size = fullDataset.size();
-		if(size%kFactor == 0){
-			paritionSize = size/kFactor;
-			int start = 0;
-			int end = 0;
-
-			while(end<size){
-				start = end;
-				end = start + paritionSize;
-				Vector<Vector> vectArr = new Vector<Vector>();
-				while(start<end){
-					vectArr.add(fullDataset.get(start));
-					start++;
-				}
-				partitionLists.add(vectArr);
-			}
-		}
-		else{
-			paritionSize = size/kFactor;
-			int start = 0;
-			int end = 0;
-			while(end<size){
-
-				start = end;
-				if((size - end) < paritionSize)
-					end = size;
-				else
-					end = start + paritionSize;
-
-				Vector<Vector> vectArr = new Vector<Vector>();
-				while(start<end){
-					vectArr.add(fullDataset.get(start));
-					start++;
-				}
-				partitionLists.add(vectArr);
-			}
-			if(partitionLists.get(partitionLists.size()-1).size() < paritionSize){
-				partitionLists.get(partitionLists.size()-2).addAll(
-						partitionLists.get(partitionLists.size()-1));
-				partitionLists.remove(partitionLists.size()-1);
-			}
-		}		
 	}
 
 	//Given K partitions K-1 to training and 1 to testing. 
